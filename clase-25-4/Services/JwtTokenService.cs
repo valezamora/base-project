@@ -8,13 +8,16 @@ using clase_25_4.Models.Auth;
 
 namespace clase_25_4.Services
 {
-	public class JwtTokenService
+	public class JwtTokenService: ITokenService
 	{
         const int EXPIRATION_MINUTES = 5;
 
-        public JwtTokenService()
-		{
-		}
+        private readonly IConfiguration _configuration;
+
+        public JwtTokenService(IConfiguration configuration)
+        {
+            _configuration = configuration ?? throw new Exception("Missing config");
+        }
 
         public AuthenticationResponse CreateToken(User user)
         {
@@ -37,8 +40,8 @@ namespace clase_25_4.Services
 
         private JwtSecurityToken CreateJwtToken(Claim[] claims, SigningCredentials credentials, DateTime expiration) =>
             new JwtSecurityToken(
-                "Issuer", // _configuration["JwtSettings:Issuer"],
-                "Audience", // _configuration["JwtSettings:Audience"],
+                _configuration["JwtSettings:Issuer"],
+                _configuration["JwtSettings:Audience"],
                 claims,
                 expires: expiration,
                 signingCredentials: credentials
@@ -56,7 +59,7 @@ namespace clase_25_4.Services
         private SigningCredentials CreateSigningCredentials() =>
             new SigningCredentials(
                 new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes("testtestes123123123123123213123123343534252435t") // _configuration["JwtSettings:Key"] ?? ""
+                    Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"] ?? throw new Exception("Missing Jwt key in config")) 
                 ),
                 SecurityAlgorithms.HmacSha256
             );

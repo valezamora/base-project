@@ -1,11 +1,32 @@
-﻿using clase_25_4.Services;
+﻿using System.Text;
+using clase_25_4.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<JwtTokenService>();
+builder.Services.AddScoped<ITokenService, JwtTokenService>();
+
+// Add authentication
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters()
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidAudience = builder.Configuration.GetValue<string>("JwtSettings:Audience"),
+            ValidIssuer = builder.Configuration.GetValue<string>("JwtSettings:Issuer"),
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("JwtSettings:Key") ?? "")
+            )
+        };
+    });
 
 var app = builder.Build();
 
@@ -20,6 +41,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+app.UseAuthentication();
+
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

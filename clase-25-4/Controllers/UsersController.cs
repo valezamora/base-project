@@ -10,9 +10,9 @@ namespace clase_25_4.Controllers;
 public class UsersController : ControllerBase
 {
     private readonly ILogger<UsersController> _logger;
-    private readonly JwtTokenService jwtTokenService;
+    private readonly ITokenService jwtTokenService;
 
-    public UsersController(ILogger<UsersController> logger, JwtTokenService jwtTokenServ)
+    public UsersController(ILogger<UsersController> logger, ITokenService jwtTokenServ)
     {
         _logger = logger;
         jwtTokenService = jwtTokenServ;
@@ -28,9 +28,20 @@ public class UsersController : ControllerBase
         // Validate user exists
         User user = new User() {
             Email = request.Username,
-            Password = request.Password,
-            Id = "2123123"
+            Password = request.Password
         };
+
+        if (user == null)
+        {
+            return BadRequest("Bad credentials");
+        }
+
+        bool isPasswordValid = true; // TODO we need to varify actual password
+
+        if (!isPasswordValid)
+        {
+            return BadRequest("Bad credentials");
+        }
 
         // Generate token
         AuthenticationResponse response = jwtTokenService.CreateToken(user);
