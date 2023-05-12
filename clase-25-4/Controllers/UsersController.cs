@@ -1,6 +1,6 @@
 ﻿using clase_25_4.Models;
 using clase_25_4.Models.Auth;
-using clase_25_4.Services;
+using clase_25_4.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 
 namespace clase_25_4.Controllers;

@@ -6,7 +6,7 @@ using System.Text;
 using clase_25_4.Models;
 using clase_25_4.Models.Auth;
 
-namespace clase_25_4.Services
+namespace clase_25_4.Services.Auth
 {
 	public class JwtTokenService: ITokenService
 	{
